@@ -1,52 +1,58 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
+  <head>
+    <script
+      type="text/javascript"
+      src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://canvasjs.com/assets/script/canvasjs.min.js"
+    ></script>
+    <script type="text/javascript">
+      window.onload = function () {
+        var dataPoints = [];
+        var otherPoints = [];
+        var chart = new CanvasJS.Chart("chartContainer", {
+          title: {
+            text: "Temperature Lausanne",
+          },
+          data: [
+            {
+              type: "line",
+              dataPoints: dataPoints,
+            },
+            {
+              type: "line",
+              dataPoints: otherPoints,
+            },
+          ],
+        });
 
-<head>
-	<script type="text/javascript" src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js">
-	</script>
-	<script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js">
-	</script>
-	<script type="text/javascript">
-		window.onload = function () {
-var dataPoints = [];
-var otherPoints = [];
-var chart = new CanvasJS.Chart("chartContainer",{
-	title:{
-		text:"Temperature Lausanne"
-	},
-	data: [{
-		type: "line",
-		dataPoints : dataPoints,
-	},
-  {
-    type: "line",
-    dataPoints : otherPoints
-  }]
-});
+        // https://www.prevision-meteo.ch/services/json/lausanne
 
+        $.getJSON("https://www.prevision-meteo.ch/services/json/lausanne",
+          function (data) {
+            $.each(data.fcst_day_0.hourly_data, function (key, value) {
+              dataPoints.push({
+                x: parseInt(key.replace("H00", "")),
+                y: value.TMP2m,
+              });
+              otherPoints.push({
+                x: parseInt(key.replace("H00", "")),
+                y: value.DPT2m,
+              });
+            });
+            console.log(dataPoints);
+            console.log(otherPoints);
+            chart.render();
+          }
+        );
+      };
+    </script>
+  </head>
 
-
-
-// https://www.prevision-meteo.ch/services/json/lausanne
-
-
-$.getJSON("https://www.prevision-meteo.ch/services/json/lausanne", function(data) {  
-	$.each(data.fcst_day_0.hourly_data, function(key, value){
-		dataPoints.push({x: parseInt(key.replace("H00", "")), y: value.TMP2m});
-    otherPoints.push({x: parseInt(key.replace("H00", "")), y: value.DPT2m});
-	});	
-  console.log(dataPoints)
-  console.log(otherPoints)
-	chart.render();
-});
-}
-
-	</script>
-
-</head>
-
-<body>
-	<div id="chartContainer" style="height: 300px; width: 100%;"></div>
-</body>
-
+  <body>
+    <div id="chartContainer" style="height: 300px; width: 100%"></div>
+  </body>
 </html>
